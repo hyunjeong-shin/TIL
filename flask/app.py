@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import request
 from flask import render_template
-from flask import requests
+
 import random
 import requests
 
@@ -53,7 +53,7 @@ def pong():
     return render_template('pong.html', name=name , message=message)
 
 @app.route('/writename')
-def select():
+def writename():
     return render_template('writename.html')
 
 @app.route('/select')
@@ -80,11 +80,57 @@ def ascii():
 @app.route('/ascii_result')
 def ascii_result():
     # 1. form 태그로 날린 데이터(word)를 받는다
-    word = 
+    word = request.args.get('nickname')
     # 2. word를 가지고 ascii_art API 요청 주소로 요청을 보낸다
-    result = requests.get(f'http://artii.herouapp.com/make?text={word}')
+    result = requests.get(f'http://artii.herokuapp.com/make?text={word}').text
     # 3. API 응답 결과를 html 파일에 담아서 보여준다.
-    return render_template('ascii_result.html', )
+    return render_template('ascii_result.html',result=result )
+
+@app.route('/lotto_check')
+def lotto_check():
+    return render_template('lotto_check.html')
+
+@app.route('/lotto_result')
+def lotto_result():
+    lotto_round = request.args.get('lotto_round')
+    response = requests.get(f'https://dhlottery.co.kr/common.do?method=getLottoNumber&drwNo={lotto_round}')
+    lotto = response.json()
+
+    winner = []
+    # 1. for 문을 활용한다.
+    for i in range(1,7):
+        winner.append(lotto[f'drwtNo{i}'])
+
+    
+    numbers = request.args.get('numbers') #string
+    numbers = numbers.split() #list - ['1','2','3','4']
+    numbers_int = []
+
+    for number in numbers:
+        numbers_int.append(int(number))
+
+    
+    matched = len(set(winner) & set(numbers_int))
+    if matched == 6:
+        result = '1등입니다!'
+    elif matched == 5:
+        if lotto["bnusNo"] in numbers_int:
+            result = '2등입니다'
+        else:
+            result = '3등입니다'
+    elif matched == 4:
+        result = '4등'
+    elif matched == 3:
+        result = '5등'
+    else:
+        result = '꽝'
+    # drwtNo6 = lotto['drwtNo6']
+
+    # 2. List Comprehension
+    # winner = [lotto[f'drwtNo{i}'] for i in range(1,7)]
+
+        #drwtNo6 = lotto.get("drwtNo6")
+        return render_template('lotto_result.html', lotto_round = lotto_round , winner = winner , numbers = numbers_int, result = result)
 
 if __name__== "__main__":
     app.run(debug=True)  # 이 파일이 직접 실행했을 떄만 실행해라. 불러왔을때는 안됨
