@@ -39,6 +39,41 @@
   > $ git add . # 파일 여러 개 한꺼번에 추가
   > $ git commit -m "Add q1-5"
   > $ git push origin master
+  > 
+  > # Ctrl + L gitbash창 위로 올라감
+  > ```
+  >
+
+- BeautifulSoup 이용 ( 웹 크롤링)
+
+  ```shell
+  # 네이버 코스피 지수
+  $ import requests
+  $ from bs4 import BeautifulSoup
+  
+  $ response = requests.get('https://finance.naver.com/sise/').text
+  # text로 읽어 오려면 .text
+  $ soup = BeautifulSoup(respose, 'html.parser')
+  $ print(type(response))
+  $ print(type(soup))
+  
+  $ kospi = soup.select_one("#KOSPI_now").text
+  $ print(kospi)
+  ```
+
+- string format
+
+  > ```shell
+  > $ import random
+  > 
+  > $ name = "신현정"
+  > $ english_name = "shin"
+  > 
+  > # pyformat
+  > $ print("안녕하세요, {}입니다. my name is {}".format(name,english_name))
+  > 
+  > # f-string
+  > $ print(f"안녕하세요,{})
   > ```
   >
   > 
